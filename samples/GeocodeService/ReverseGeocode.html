@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=7" />
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Find Address</title>
+    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/dojo/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/css/esri.css" />
+
+    <style>
+      html, body { height: 100%; width: 100%; margin: 0; padding: 0; } 
+      #map{ 
+        padding:0;
+        border:solid 2px #94C7BA;
+        margin:5px;
+      }
+      #header {
+        border: solid 2px #94C7BA;
+        padding-top:5px;
+        padding-left:10px;
+        background-color:white; 
+        color:#594735; 
+        font-size:14pt;
+        text-align:left; font-weight:bold;
+        height:35px;
+        margin:5px;
+        overflow:hidden;
+      }
+      .roundedCorners{
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+      }
+      .shadow{
+         box-shadow: 4px 4px 8px #adadad;
+        -webkit-box-shadow: 4px 4px 8px #adadad;
+        -moz-box-shadow: 4px 4px 8px #adadad;
+        -o-box-shadow: 4px 4px 8px #adadad;
+      }
+    </style>
+    <script type="text/javascript">
+      var djConfig = {
+        parseOnLoad: true
+      };
+    </script>
+
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=3.2"></script>
+    <script type="text/javascript">
+      dojo.require("esri.map");
+      dojo.require("esri.tasks.locator");
+      dojo.require("dijit.layout.BorderContainer");
+      dojo.require("dijit.layout.ContentPane");
+      
+      
+      function init() {
+        var map = new esri.Map("map", { extent: esri.geometry.geographicToWebMercator(new esri.geometry.Extent(-95.2991, 38.9379, -95.2476, 38.963, new esri.SpatialReference({wkid:4326}))) });
+
+        dojo.connect(map, 'onLoad', function(map) {
+          //resize the map when the browser resizes
+          dojo.connect(dijit.byId('map'), 'resize', map,map.resize);
+        });
+        
+        var tiledMapServiceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
+        map.addLayer(tiledMapServiceLayer);
+
+        var locator = new esri.tasks.Locator("http://geocodeservice.apphb.com/rest/services/MapQuest/GeocodeServer");
+
+        var infoTemplate = new esri.InfoTemplate("Location", "street: ${street} <br/>adminArea4: ${adminArea4} <br/>adminArea4: ${adminArea4} <br/>sadminArea3: ${adminArea3} <br/>adminArea1: ${adminArea1} <br/>postalCode: ${postalCode} <br/>");
+        var symbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 15, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,0,255]), 2), new dojo.Color([0,0,255]));
+
+        dojo.connect(locator, "onLocationToAddressComplete", function(candidate) {
+          if (candidate.address) {
+            //this service returns geocoding results in geographic - convert to web mercator to display on map
+            var location = esri.geometry.geographicToWebMercator(candidate.location);
+            var graphic = new esri.Graphic(location, symbol, candidate.address, infoTemplate);
+            map.graphics.add(graphic);
+            
+            map.infoWindow.setTitle(graphic.getTitle());
+            map.infoWindow.setContent(graphic.getContent());
+            
+            //display the info window with the address information
+            var screenPnt = map.toScreen(location);
+            map.infoWindow.resize(200,100);
+            map.infoWindow.show(screenPnt,map.getInfoWindowAnchor(screenPnt));
+          }
+        });
+
+        dojo.connect(map, "onClick", function(evt) {
+          map.graphics.clear();
+          locator.locationToAddress(esri.geometry.webMercatorToGeographic(evt.mapPoint), 100);
+        });
+      }
+      
+      dojo.addOnLoad(init);
+    </script>
+  </head>
+  <body class="claro">
+    <div id="mainWindow" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height:100%;">
+      <div id="header" class="shadow roundedCorners" dojotype="dijit.layout.ContentPane" region="top">
+        <span>Click the map to get the address for the input location.</span>     
+      </div>
+      <div id="map" class="roundedCorners" dojotype="dijit.layout.ContentPane" region="center">
+      </div>
+    </div>
+  </body>
+</html>
