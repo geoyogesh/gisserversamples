@@ -77,7 +77,7 @@
         });
         
         
-        locator = new esri.tasks.Locator("http://geocodeservice.apphb.com/rest/services/MapQuest/GeocodeServer");
+        locator = new esri.tasks.Locator("http://geocodeservice.apphb.com/rest/services/MapQuest/GeocodeServer"); //http://localhost.:1979/rest/services/MapQuest/GeocodeServer
         dojo.connect(locator, "onAddressToLocationsComplete", showResults);
         
         map.infoWindow.resize(200,125);
@@ -97,7 +97,7 @@
       function showResults(candidates) {
         var candidate;
         var symbol = new esri.symbol.SimpleMarkerSymbol();
-        var infoTemplate = new esri.InfoTemplate("Location", "Address: ${address}<br />Score: ${score}<br />Source locator: ${locatorName}");
+        var infoTemplate = new esri.InfoTemplate("Location", "street: ${street} <br/>adminArea5: ${adminArea5} <br/>adminArea4: ${adminArea4} <br/>sadminArea3: ${adminArea3} <br/>adminArea1: ${adminArea1} <br/>postalCode: ${postalCode} <br/>");
 
         symbol.setStyle(esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE);
         symbol.setColor(new dojo.Color([153,0,51,0.75]));

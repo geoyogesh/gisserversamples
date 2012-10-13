@@ -68,7 +68,7 @@
 
         var locator = new esri.tasks.Locator("http://geocodeservice.apphb.com/rest/services/MapQuest/GeocodeServer");
 
-        var infoTemplate = new esri.InfoTemplate("Location", "street: ${street} <br/>adminArea4: ${adminArea4} <br/>adminArea4: ${adminArea4} <br/>sadminArea3: ${adminArea3} <br/>adminArea1: ${adminArea1} <br/>postalCode: ${postalCode} <br/>");
+        var infoTemplate = new esri.InfoTemplate("Location", "street: ${street} <br/>adminArea5: ${adminArea5} <br/>adminArea4: ${adminArea4} <br/>sadminArea3: ${adminArea3} <br/>adminArea1: ${adminArea1} <br/>postalCode: ${postalCode} <br/>");
         var symbol = new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 15, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0,0,255]), 2), new dojo.Color([0,0,255]));
 
         dojo.connect(locator, "onLocationToAddressComplete", function(candidate) {
